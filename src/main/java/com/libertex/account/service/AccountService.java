@@ -6,6 +6,7 @@ import com.libertex.account.exception.AccountWasChangedException;
 import com.libertex.account.exception.NotEnoughMoneyException;
 import com.libertex.account.repository.AccountRepository;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +26,8 @@ public class AccountService {
 
     public void increaseAccounts(Account account) {
         Optional<Account> optionalAccount = accountRepository.findById(account.getAccountId());
-        Account updatedAccount = optionalAccount.isPresent() ? optionalAccount.get()
-                : Account.builder().accountId(account.getAccountId()).amount(BigDecimal.ZERO).build();
+        Account updatedAccount = optionalAccount.orElseGet(() ->
+                Account.builder().accountId(account.getAccountId()).amount(BigDecimal.ZERO).build());
         BigDecimal newAmount = updatedAccount.getAmount().add(account.getAmount());
         updatedAccount.setAmount(newAmount);
         accountRepository.save(updatedAccount);
