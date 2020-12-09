@@ -34,10 +34,11 @@ dependencies {
 	implementation 'mysql:mysql-connector-java'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-	}
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	testImplementation 'org.mockito:mockito-core:2.+'
+
+	testCompileOnly 'junit:junit:4.12'
+	testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
 }
 
 test {
