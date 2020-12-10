@@ -21,6 +21,11 @@ public class AccountController {
         return accountService.getAllAccounts();
     }
 
+    @GetMapping("/{accountId}")
+    public Account getAccaountById(@PathVariable("accountId") String accountId) {
+        return accountService.getAccountById(accountId);
+    }
+
     @PostMapping("/inc")
     public void incAccount(@RequestBody Account account) {
         accountService.increaseAccounts(account);

@@ -31,9 +31,6 @@ public class AccountServiceTest {
 
     private AccountService accountService;
 
-    //@Rule
-
-
     @BeforeEach
     void setUp() {
         accountRepository = Mockito.mock(AccountRepository.class);
@@ -50,6 +47,25 @@ public class AccountServiceTest {
         List<Account> accounts = accountService.getAllAccounts();
         assertNotNull(accounts);
         assertEquals(1, accounts.size());
+    }
+
+    @Test
+    public   void testGetBYId() {
+        Account account = Account.builder()
+                .accountId("accountId")
+                .amount(new BigDecimal(15.5))
+                .build();
+        when(accountRepository.findById("accountId")).thenReturn(Optional.of(account));
+        Account findAccount = accountService.getAccountById("accountId");
+        assertNotNull(findAccount);
+        assertEquals("accountId", findAccount.getAccountId());
+    }
+
+    @Test
+    public   void testGetBYIdNotFound() {
+        when(accountRepository.findById("accountIdNotExists")).thenReturn(Optional.empty());
+        Assertions.assertThrows(AccountDoesNotExists.class,
+                () -> accountService.getAccountById("accountIdNotExists"));
     }
 
     @Test
@@ -103,9 +119,8 @@ public class AccountServiceTest {
                 .amount(new BigDecimal(155.5))
                 .build();
         when(accountRepository.findById("accountId")).thenReturn(Optional.of(accountInDb));
-        Assertions.assertThrows(NotEnoughMoneyException.class, () -> {
-            accountService.decreaseAccounts(accountForDec);
-        });
+        Assertions.assertThrows(NotEnoughMoneyException.class,
+                () -> accountService.decreaseAccounts(accountForDec));
     }
 
     @Test
@@ -115,13 +130,12 @@ public class AccountServiceTest {
                 .amount(new BigDecimal(155.5))
                 .build();
         when(accountRepository.findById("accountId")).thenReturn(Optional.empty());
-        Assertions.assertThrows(AccountDoesNotExists.class, () -> {
-            accountService.decreaseAccounts(accountForDec);
-        });
+        Assertions.assertThrows(AccountDoesNotExists.class,
+                () -> accountService.decreaseAccounts(accountForDec));
     }
 
     @Test
-    public void decreaseAccountsWhenAccountDoesNotExists2(){
+    public void decreaseAccountsWhenAccountWasChanged(){
         Account accountInDb = Account.builder()
                 .accountId("accountId")
                 .amount(new BigDecimal(15.5))
@@ -132,8 +146,7 @@ public class AccountServiceTest {
                 .build();
         when(accountRepository.findById("accountId")).thenReturn(Optional.of(accountInDb));
         when(accountRepository.save(any(Account.class))).thenThrow(ObjectOptimisticLockingFailureException.class);
-        Assertions.assertThrows(AccountWasChangedException.class, () -> {
-            accountService.decreaseAccounts(accountForDec);
-        });
+        Assertions.assertThrows(AccountWasChangedException.class,
+                () -> accountService.decreaseAccounts(accountForDec));
     }
 }

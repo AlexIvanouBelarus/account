@@ -24,6 +24,11 @@ public class AccountService {
         return accountRepository.findAll();
     }
 
+    public Account getAccountById(String accountId){
+        Optional<Account> optionalAccount = accountRepository.findById(accountId);
+        return optionalAccount.orElseThrow(() -> new AccountDoesNotExists("Account does not exists"));
+    }
+
     public void increaseAccounts(Account account) {
         Optional<Account> optionalAccount = accountRepository.findById(account.getAccountId());
         Account updatedAccount = optionalAccount.orElseGet(() ->
